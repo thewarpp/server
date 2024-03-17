@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"server/handler"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -16,6 +17,21 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/", s.HelloWorldHandler)
 
 	r.Get("/health", s.healthHandler)
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Mount("/workspace", s.workspaceRouter())
+	})
+
+	return r
+}
+
+func (s *Server) workspaceRouter() http.Handler {
+	r := chi.NewRouter()
+
+	r.Get("/", handler.HandleGetWorkspaces)
+	r.Post("/", handler.HandlePostWorkspace)
+	r.Get("/{workspaceID}", handler.HandleGetWorkspace)
+	r.Delete("/{workspaceID}", handler.HandleDeleteWorkspace)
 
 	return r
 }
