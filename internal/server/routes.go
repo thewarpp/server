@@ -32,6 +32,7 @@ func (s *Server) workspaceRouter() http.Handler {
 	r.Post("/", handler.HandlePostWorkspace)
 	r.Get("/{workspaceID}", handler.HandleGetWorkspace)
 	r.Delete("/{workspaceID}", handler.HandleDeleteWorkspace)
+	r.Patch("/{workspaceID}", handler.HandleDeleteWorkspace)
 
 	return r
 }
