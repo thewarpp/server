@@ -2,11 +2,12 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
@@ -17,9 +18,10 @@ type Service interface {
 }
 
 type service struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
+var db *sqlx.DB
 var (
 	database = os.Getenv("DB_DATABASE")
 	password = os.Getenv("DB_PASSWORD")
@@ -29,8 +31,9 @@ var (
 )
 
 func New() Service {
+	var err error
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
-	db, err := sql.Open("pgx", connStr)
+	db, err = sqlx.Open("pgx", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,4 +53,8 @@ func (s *service) Health() map[string]string {
 	return map[string]string{
 		"message": "It's healthy",
 	}
+}
+
+func GetDB() *sqlx.DB {
+	return db
 }
